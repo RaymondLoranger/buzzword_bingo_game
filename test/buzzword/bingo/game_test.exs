@@ -2,6 +2,7 @@ defmodule Buzzword.Bingo.GameTest do
   use ExUnit.Case, async: true
 
   alias Buzzword.Bingo.{Game, Player, Square}
+  alias Buzzword.Bingo.Game.Checker
 
   doctest Game
 
@@ -33,8 +34,20 @@ defmodule Buzzword.Bingo.GameTest do
       %Square{phrase: "C3", points: 303, marked_by: joe}
     ]
 
-    virgin = %Game{name: "virgin", size: 3, squares: virgin_squares}
-    marked = %Game{name: "marked", size: 3, squares: marked_squares}
+    virgin = %Game{
+      name: "virgin",
+      size: 3,
+      squares: virgin_squares,
+      winner: nil
+    }
+
+    marked = %Game{
+      name: "marked",
+      size: 3,
+      squares: marked_squares,
+      winner: joe
+    }
+
     games = %{virgin: virgin, marked: marked}
     players = %{joe: joe, jim: jim}
     {:ok, games: games, players: players}
@@ -89,14 +102,21 @@ defmodule Buzzword.Bingo.GameTest do
              }
     end
 
-    test "ignores a marked square", %{games: games, players: players} do
+    test "keeps marked square as is", %{games: games, players: players} do
+      marked_square = Enum.at(games.marked.squares, 2)
       %Game{} = game = Game.mark(games.marked, "A3", players.joe)
+      assert ^marked_square = Enum.at(game.squares, 2)
 
       assert Enum.at(game.squares, 2) == %Square{
                phrase: "A3",
                points: 103,
                marked_by: players.jim
              }
+    end
+
+    test "returns a won game as is", %{games: games, players: players} do
+      marked_game = games.marked
+      assert ^marked_game = Game.mark(marked_game, "A2", players.joe)
     end
   end
 end

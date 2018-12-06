@@ -57,12 +57,15 @@ defmodule Buzzword.Bingo.Game do
   updates the scores, and checks for a bingo!
   """
   @spec mark(t, String.t(), Player.t()) :: t
-  def mark(%Game{} = game, phrase, %Player{} = player) when is_binary(phrase) do
+  def mark(%Game{winner: nil} = game, phrase, %Player{} = player)
+      when is_binary(phrase) do
     game
     |> update_squares(phrase, player)
     |> update_scores()
     |> assign_winner_if_bingo(phrase, player)
   end
+
+  def mark(game, _phrase, _player), do: game
 
   ## Private functions
 
