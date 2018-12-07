@@ -58,5 +58,10 @@ defmodule Buzzword.Bingo.Game.CheckerTest do
       refute Checker.bingo?(games.virgin, "A1", players.joe)
       refute Checker.bingo?(games.marked, "A3", players.jim)
     end
+
+    test "returns false if bad phrase", %{games: games, players: players} do
+      assert Checker.bingo?(games.marked, "A1", players.joe)
+      refute Checker.bingo?(games.marked, "a1", players.joe)
+    end
   end
 end

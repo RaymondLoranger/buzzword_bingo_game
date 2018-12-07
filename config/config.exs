@@ -5,7 +5,8 @@ use Mix.Config
 # Mix messages in colors...
 config :elixir, ansi_enabled: true
 
+config :buzzword_bingo_game, size_range: 3..5
+
 #     import_config "#{Mix.env()}.exs"
 import_config "config_logger.exs"
-import_config "persist.exs"
 import_config "persist_course_ref.exs"

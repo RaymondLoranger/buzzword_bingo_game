@@ -11,7 +11,7 @@ defmodule Buzzword.Bingo.Game.Checker do
   Checks the flat list of `size` x `size` `squares` of the given `game`.
   Returns `true` if all the `squares` of a line (row, column or diagonal)
   containing the given `phrase` have been marked by the given `player`.
-  Otherwise `false` is returned.
+  Returns `false` otherwise or when the given `phrase` cannot be found.
   We use a list of `size` indexes to represent the lines to be checked.
   """
   @spec bingo?(Game.t(), String.t(), Player.t()) :: boolean
@@ -21,12 +21,13 @@ defmodule Buzzword.Bingo.Game.Checker do
         %Player{} = player
       )
       when is_binary(phrase) do
-    with index = index(squares, phrase),
+    with index when is_integer(index) <- index(squares, phrase),
          false <- size |> row(index) |> line_bingo?(squares, player),
          false <- size |> col(index) |> line_bingo?(squares, player),
          false <- size |> main_diag() |> line_bingo?(index, squares, player) do
       size |> anti_diag() |> line_bingo?(index, squares, player)
     else
+      nil -> false
       true -> true
     end
   end
@@ -44,7 +45,7 @@ defmodule Buzzword.Bingo.Game.Checker do
     end)
   end
 
-  @spec index([Square.t()], String.t()) :: index
+  @spec index([Square.t()], String.t()) :: index | nil
   defp index(squares, phrase),
     do: Enum.find_index(squares, fn square -> square.phrase == phrase end)
 
