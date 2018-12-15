@@ -9,5 +9,5 @@
   "mix_tasks": {:git, "https://github.com/RaymondLoranger/mix_tasks.git", "408522a83d49a8ec0e796d6a68ba4c0d10e76254", []},
   "nimble_parsec": {:hex, :nimble_parsec, "0.4.0", "ee261bb53214943679422be70f1658fff573c5d0b0a1ecd0f18738944f818efe", [:mix], [], "hexpm"},
   "persist_config": {:hex, :persist_config, "0.2.13", "2f6ecc22cfa31e05c6af50954d29cf170614c02e151004b6ba0c63128ea2203c", [:mix], [], "hexpm"},
-  "poison": {:hex, :poison, "3.1.0", "d9eb636610e096f86f25d9a46f35a9facac35609a7591b3be3326e99a0484665", [:mix], [], "hexpm"},
+  "poison": {:hex, :poison, "4.0.1", "bcb755a16fac91cad79bfe9fc3585bb07b9331e50cfe3420a24bcc2d735709ae", [:mix], [], "hexpm"},
 }
