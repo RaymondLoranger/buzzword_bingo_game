@@ -22,6 +22,14 @@ defmodule Buzzword.Bingo.Game.CheckerTest do
       Square.new("C3", 303)
     ]
 
+    virgin_game = %Game{
+      name: "virgin-game",
+      size: 3,
+      squares: virgin_squares,
+      scores: %{},
+      winner: nil
+    }
+
     marked_squares = [
       %Square{phrase: "A1", points: 101, marked_by: joe},
       %Square{phrase: "A2", points: 102, marked_by: nil},
@@ -34,9 +42,15 @@ defmodule Buzzword.Bingo.Game.CheckerTest do
       %Square{phrase: "C3", points: 303, marked_by: joe}
     ]
 
-    virgin = %Game{name: "virgin", size: 3, squares: virgin_squares}
-    marked = %Game{name: "marked", size: 3, squares: marked_squares}
-    games = %{virgin: virgin, marked: marked}
+    marked_game = %Game{
+      name: "marked-game",
+      size: 3,
+      squares: marked_squares,
+      scores: %{joe => 606, jim => 404},
+      winner: joe
+    }
+
+    games = %{virgin: virgin_game, marked: marked_game}
     players = %{joe: joe, jim: jim}
     {:ok, games: games, players: players}
   end
