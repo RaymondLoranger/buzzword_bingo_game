@@ -9,47 +9,31 @@ defmodule Buzzword.Bingo.GameTest do
     joe = Player.new("Joe", "light_blue")
     jim = Player.new("Jim", "light_cyan")
 
-    virgin_squares = [
-      Square.new("A1", 101),
-      Square.new("A2", 102),
-      Square.new("A3", 103),
-      Square.new("B1", 201),
-      Square.new("B2", 202),
-      Square.new("B3", 203),
-      Square.new("C1", 301),
-      Square.new("C2", 302),
-      Square.new("C3", 303)
-    ]
+    game = fn name ->
+      Game.new(name, 3, [
+        {"A1", 101},
+        {"A2", 102},
+        {"A3", 103},
+        {"B1", 201},
+        {"B2", 202},
+        {"B3", 203},
+        {"C1", 301},
+        {"C2", 302},
+        {"C3", 303}
+      ])
+    end
 
-    virgin_game = %Game{
-      name: "virgin-game",
-      size: 3,
-      squares: virgin_squares,
-      scores: %{},
-      winner: nil
-    }
+    new_game = game.("new-game")
 
-    marked_squares = [
-      %Square{phrase: "A1", points: 101, marked_by: joe},
-      %Square{phrase: "A2", points: 102, marked_by: nil},
-      %Square{phrase: "A3", points: 103, marked_by: jim},
-      %Square{phrase: "B1", points: 201, marked_by: nil},
-      %Square{phrase: "B2", points: 202, marked_by: joe},
-      %Square{phrase: "B3", points: 203, marked_by: nil},
-      %Square{phrase: "C1", points: 301, marked_by: jim},
-      %Square{phrase: "C2", points: 302, marked_by: nil},
-      %Square{phrase: "C3", points: 303, marked_by: joe}
-    ]
+    won_game =
+      game.("won-game")
+      |> Game.mark("A1", joe)
+      |> Game.mark("A3", jim)
+      |> Game.mark("B2", joe)
+      |> Game.mark("C1", jim)
+      |> Game.mark("C3", joe)
 
-    marked_game = %Game{
-      name: "marked-game",
-      size: 3,
-      squares: marked_squares,
-      scores: %{joe => 606, jim => 404},
-      winner: joe
-    }
-
-    games = %{virgin: virgin_game, marked: marked_game}
+    games = %{new_game: new_game, won_game: won_game}
     players = %{joe: joe, jim: jim}
     {:ok, games: games, players: players}
   end
@@ -94,7 +78,7 @@ defmodule Buzzword.Bingo.GameTest do
 
   describe "Game.mark/3" do
     test "marks a virgin square", %{games: games, players: players} do
-      %Game{} = game = Game.mark(games.virgin, "A1", players.joe)
+      %Game{} = game = Game.mark(games.new_game, "A1", players.joe)
 
       assert Enum.at(game.squares, 0) == %Square{
                phrase: "A1",
@@ -104,7 +88,7 @@ defmodule Buzzword.Bingo.GameTest do
     end
 
     test "keeps marked square as is", %{games: games, players: players} do
-      %Game{} = game = Game.mark(games.virgin, "A3", players.jim)
+      %Game{} = game = Game.mark(games.new_game, "A3", players.jim)
       assert ^game = Game.mark(game, "A3", players.joe)
 
       assert Enum.at(game.squares, 2) == %Square{
@@ -115,8 +99,19 @@ defmodule Buzzword.Bingo.GameTest do
     end
 
     test "returns a won game as is", %{games: games, players: players} do
-      marked_game = games.marked
-      assert ^marked_game = Game.mark(marked_game, "A2", players.joe)
+      won_game = games.won_game
+      assert ^won_game = Game.mark(won_game, "A2", players.joe)
+    end
+
+    test "scores of a won game", %{games: games, players: players} do
+      assert games.won_game.scores == %{
+               players.joe => {606, 3},
+               players.jim => {404, 2}
+             }
+    end
+
+    test "winner of a won game", %{games: games, players: players} do
+      assert games.won_game.winner == players.joe
     end
   end
 end

@@ -23,6 +23,7 @@ defmodule Buzzword.Bingo.Game.MixProject do
     [
       {:mix_tasks,
        github: "RaymondLoranger/mix_tasks", only: :dev, runtime: false},
+      {:persist_config, "~> 0.1"},
       {:buzzword_bingo_player, path: "../buzzword_bingo_player"},
       {:buzzword_bingo_square, path: "../buzzword_bingo_square"},
       {:buzzword_cache, path: "../buzzword_cache"},

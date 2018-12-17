@@ -26,7 +26,7 @@ defmodule Buzzword.Bingo.Game do
           name: String.t(),
           size: pos_integer,
           squares: [Square.t()],
-          scores: %{Player.t() => pos_integer},
+          scores: %{Player.t() => {pos_integer, pos_integer}},
           winner: Player.t() | nil
         }
 
@@ -37,17 +37,17 @@ defmodule Buzzword.Bingo.Game do
   taken randomly from the given map of `buzzwords` where
   each buzzword is of the form `{phrase, points}`.
   """
-  @spec new(String.t(), pos_integer, map) :: t | {:error, atom}
+  @spec new(String.t(), pos_integer, map | list) :: t | {:error, atom}
   def new(name, size, buzzwords \\ Cache.get_buzzwords())
 
-  def new(name, size, %{} = buzzwords)
-      when is_binary(name) and size in @size_range do
-    squares =
-      buzzwords
-      |> Enum.take_random(size * size)
-      |> Enum.map(&Square.new/1)
+  def new(name, size, buzzwords)
+      when is_binary(name) and size in @size_range and is_map(buzzwords) do
+    new(name, size, Enum.take_random(buzzwords, size * size))
+  end
 
-    %Game{name: name, size: size, squares: squares}
+  def new(name, size, buzzwords)
+      when is_binary(name) and size in @size_range and is_list(buzzwords) do
+    %Game{name: name, size: size, squares: Enum.map(buzzwords, &Square.new/1)}
   end
 
   def new(_name, _size, _buzzwords), do: {:error, :invalid_game_args}
@@ -82,11 +82,14 @@ defmodule Buzzword.Bingo.Game do
       |> Stream.reject(&is_nil(&1.marked_by))
       |> Stream.map(fn square -> {square.marked_by, square.points} end)
       |> Enum.reduce(%{}, fn {player, points}, scores ->
-        Map.update(scores, player, points, &(&1 + points))
+        Map.update(scores, player, {points, 1}, &inc(&1, points))
       end)
 
     put_in(game.scores, scores)
   end
+
+  @spec inc(tuple, pos_integer) :: {pos_integer, pos_integer}
+  defp inc({score, marked}, points), do: {score + points, marked + 1}
 
   @spec assign_winner_if_bingo(t, String.t(), Player.t()) :: t
   defp assign_winner_if_bingo(game, phrase, player) do
