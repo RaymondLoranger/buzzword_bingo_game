@@ -15,7 +15,7 @@ info_path = "./log/info.log"
 warn_path = "./log/warn.log"
 error_path = "./log/error.log"
 
-config :logger, :console, format: format
+# config :logger, :console, format: format
 config :logger, :info_log, format: format, path: info_path, level: :info
 config :logger, :warn_log, format: format, path: warn_path, level: :warn
 config :logger, :error_log, format: format, path: error_path, level: :error
@@ -29,7 +29,7 @@ config :logger,
   ]
 
 # Purges debug messages...
-config :logger, compile_time_purge_level: :info
+# config :logger, compile_time_purge_level: :info
 
 # Keeps only error messages...
 # config :logger, compile_time_purge_level: :error
