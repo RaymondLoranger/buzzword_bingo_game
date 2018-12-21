@@ -12,8 +12,6 @@ defmodule Buzzword.Bingo.Game do
   \n##### #{@course_ref}
   """
 
-  use PersistConfig
-
   alias __MODULE__
   alias __MODULE__.Checker
   alias Buzzword.Bingo.{Player, Square}
