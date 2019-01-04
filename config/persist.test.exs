@@ -1,3 +1,3 @@
 use Mix.Config
 
-config :buzzword_cache, log?: false
+config :file_only_logger, log?: false

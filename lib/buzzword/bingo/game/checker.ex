@@ -12,7 +12,7 @@ defmodule Buzzword.Bingo.Game.Checker do
   Returns `true` if all the `squares` of a line (row, column or diagonal)
   containing the given `phrase` have been marked by the given `player`.
   Returns `false` otherwise or when the given `phrase` cannot be found.
-  We use a list of `size` indexes to represent the lines to be checked.
+  We use lists of `size` indexes to represent the lines to be checked.
   """
   @spec bingo?(Game.t(), String.t(), Player.t()) :: boolean
   def bingo?(
