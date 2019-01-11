@@ -1,8 +1,8 @@
 defmodule Buzzword.Bingo.Game.CheckerTest do
   use ExUnit.Case, async: true
 
-  alias Buzzword.Bingo.{Game, Player}
   alias Buzzword.Bingo.Game.Checker
+  alias Buzzword.Bingo.{Game, Player}
 
   doctest Checker
 
