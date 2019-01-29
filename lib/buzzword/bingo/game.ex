@@ -32,7 +32,7 @@ defmodule Buzzword.Bingo.Game do
 
   @doc """
   Creates a `game` with a flat list of `size` x `size` squares
-  taken randomly from the given map of `buzzwords` where
+  taken randomly from the given map or list of `buzzwords` where
   each buzzword is of the form `{phrase, points}`.
   """
   @spec new(String.t(), pos_integer, map | list) :: t | {:error, atom}
@@ -77,8 +77,8 @@ defmodule Buzzword.Bingo.Game do
   defp update_scores(game) do
     scores =
       game.squares
-      |> Stream.reject(&is_nil(&1.marked_by))
-      |> Stream.map(fn square -> {square.marked_by, square.points} end)
+      |> Enum.reject(&is_nil(&1.marked_by))
+      |> Enum.map(fn square -> {square.marked_by, square.points} end)
       |> Enum.reduce(%{}, fn {player, points}, scores ->
         Map.update(scores, player, {points, 1}, &inc(&1, points))
       end)
