@@ -28,6 +28,7 @@ defmodule Buzzword.Bingo.Game do
           winner: Player.t() | nil
         }
 
+  @pmark_th_sz Application.get_env(@app, :parallel_marking_threshold_size)
   @size_range Application.get_env(@app, :size_range)
 
   @doc """
@@ -55,10 +56,10 @@ defmodule Buzzword.Bingo.Game do
   updates the scores, and checks for a bingo!
   """
   @spec mark(t, String.t(), Player.t()) :: t
-  def mark(%Game{winner: nil} = game, phrase, %Player{} = player)
+  def mark(%Game{size: size, winner: nil} = game, phrase, %Player{} = player)
       when is_binary(phrase) do
     game
-    |> update_squares(phrase, player)
+    |> update_squares(phrase, player, size > @pmark_th_sz)
     |> update_scores()
     |> assign_winner_if_bingo(phrase, player)
   end
@@ -67,10 +68,22 @@ defmodule Buzzword.Bingo.Game do
 
   ## Private functions
 
-  @spec update_squares(t, String.t(), Player.t()) :: t
-  defp update_squares(game, phrase, player) do
+  @spec update_squares(t, String.t(), Player.t(), boolean) :: t
+  defp update_squares(game, phrase, player, false = _pmark?) do
     squares = Enum.map(game.squares, &Square.mark(&1, phrase, player))
     put_in(game.squares, squares)
+  end
+
+  defp update_squares(game, phrase, player, true = _pmark?) do
+    squares = pmap(game.squares, &Square.mark(&1, phrase, player))
+    put_in(game.squares, squares)
+  end
+
+  @spec pmap(Enum.t(), (any -> any)) :: list
+  defp pmap(enum, fun) do
+    enum
+    |> Enum.map(&Task.async(fn -> fun.(&1) end))
+    |> Enum.map(&Task.await/1)
   end
 
   @spec update_scores(t) :: t
