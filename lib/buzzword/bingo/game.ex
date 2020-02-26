@@ -32,20 +32,21 @@ defmodule Buzzword.Bingo.Game do
   @size_range Application.get_env(@app, :size_range)
 
   @doc """
-  Creates a `game` with a flat list of `size` x `size` squares
-  taken randomly from the given map or list of `buzzwords` where
-  each buzzword is of the form `{phrase, points}`.
+  Creates a `game` with a flat list of `size` x `size` squares created
+  from the given map or list of `buzzwords` of the form `{phrase, points}`.
   """
   @spec new(String.t(), pos_integer, map | list) :: t | {:error, atom}
   def new(name, size, buzzwords \\ Cache.get_buzzwords())
 
   def new(name, size, buzzwords)
-      when is_binary(name) and size in @size_range and is_map(buzzwords) do
+      when is_binary(name) and size in @size_range and is_map(buzzwords) and
+             map_size(buzzwords) >= size * size do
     new(name, size, Enum.take_random(buzzwords, size * size))
   end
 
   def new(name, size, buzzwords)
-      when is_binary(name) and size in @size_range and is_list(buzzwords) do
+      when is_binary(name) and size in @size_range and is_list(buzzwords) and
+             length(buzzwords) == size * size do
     %Game{name: name, size: size, squares: Enum.map(buzzwords, &Square.new/1)}
   end
 
