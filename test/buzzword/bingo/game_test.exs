@@ -35,7 +35,7 @@ defmodule Buzzword.Bingo.GameTest do
 
     games = %{new_game: new_game, won_game: won_game}
     players = %{joe: joe, jim: jim}
-    {:ok, games: games, players: players}
+    %{games: games, players: players}
   end
 
   describe "Game.new/3" do
@@ -103,14 +103,14 @@ defmodule Buzzword.Bingo.GameTest do
       assert ^won_game = Game.mark(won_game, "A2", players.joe)
     end
 
-    test "scores of a won game", %{games: games, players: players} do
+    test "updates scores of a won game", %{games: games, players: players} do
       assert games.won_game.scores == %{
                players.joe => {606, 3},
                players.jim => {404, 2}
              }
     end
 
-    test "winner of a won game", %{games: games, players: players} do
+    test "assigns winner of a won game", %{games: games, players: players} do
       assert games.won_game.winner == players.joe
     end
   end

@@ -36,7 +36,7 @@ defmodule Buzzword.Bingo.Game.CheckerTest do
 
     games = %{new_game: new_game, won_game: won_game}
     players = %{joe: joe, jim: jim}
-    {:ok, games: games, players: players}
+    %{games: games, players: players}
   end
 
   describe "Checker.bingo?/3" do

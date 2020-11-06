@@ -4,7 +4,7 @@
 defmodule Buzzword.Bingo.Game do
   use PersistConfig
 
-  @course_ref Application.get_env(@app, :course_ref)
+  @course_ref get_env(:course_ref)
 
   @moduledoc """
   Creates a `game` struct for the _Multi-Player Bingo_ game.
@@ -28,8 +28,8 @@ defmodule Buzzword.Bingo.Game do
           winner: Player.t() | nil
         }
 
-  @pmark_th_sz Application.get_env(@app, :parallel_marking_threshold_size)
-  @size_range Application.get_env(@app, :size_range)
+  @pmark_th_sz get_env(:parallel_marking_threshold_size)
+  @size_range get_env(:size_range)
 
   @doc """
   Creates a `game` with a flat list of `size` x `size` squares created
