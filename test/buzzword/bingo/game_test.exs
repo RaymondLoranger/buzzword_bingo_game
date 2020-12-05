@@ -27,11 +27,11 @@ defmodule Buzzword.Bingo.GameTest do
 
     won_game =
       game.("won-game")
-      |> Game.mark("A1", joe)
-      |> Game.mark("A3", jim)
-      |> Game.mark("B2", joe)
-      |> Game.mark("C1", jim)
-      |> Game.mark("C3", joe)
+      |> Game.mark_square("A1", joe)
+      |> Game.mark_square("A3", jim)
+      |> Game.mark_square("B2", joe)
+      |> Game.mark_square("C1", jim)
+      |> Game.mark_square("C3", joe)
 
     games = %{new_game: new_game, won_game: won_game}
     players = %{joe: joe, jim: jim}
@@ -78,7 +78,7 @@ defmodule Buzzword.Bingo.GameTest do
 
   describe "Game.mark/3" do
     test "marks a virgin square", %{games: games, players: players} do
-      %Game{} = game = Game.mark(games.new_game, "A1", players.joe)
+      %Game{} = game = Game.mark_square(games.new_game, "A1", players.joe)
 
       assert Enum.at(game.squares, 0) == %Square{
                phrase: "A1",
@@ -88,8 +88,8 @@ defmodule Buzzword.Bingo.GameTest do
     end
 
     test "keeps marked square as is", %{games: games, players: players} do
-      %Game{} = game = Game.mark(games.new_game, "A3", players.jim)
-      assert ^game = Game.mark(game, "A3", players.joe)
+      %Game{} = game = Game.mark_square(games.new_game, "A3", players.jim)
+      assert ^game = Game.mark_square(game, "A3", players.joe)
 
       assert Enum.at(game.squares, 2) == %Square{
                phrase: "A3",
@@ -100,7 +100,7 @@ defmodule Buzzword.Bingo.GameTest do
 
     test "returns a won game as is", %{games: games, players: players} do
       won_game = games.won_game
-      assert ^won_game = Game.mark(won_game, "A2", players.joe)
+      assert ^won_game = Game.mark_square(won_game, "A2", players.joe)
     end
 
     test "updates scores of a won game", %{games: games, players: players} do

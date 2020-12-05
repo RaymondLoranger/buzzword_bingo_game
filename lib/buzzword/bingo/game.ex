@@ -55,16 +55,16 @@ defmodule Buzzword.Bingo.Game do
   Marks the square having the given `phrase` for the given `player`,
   updates the scores, and checks for a bingo!
   """
-  @spec mark(t, String.t(), Player.t()) :: t
-  def mark(%Game{size: size, winner: nil} = game, phrase, %Player{} = player)
+  @spec mark_square(t, String.t(), Player.t()) :: t
+  def mark_square(%Game{winner: nil} = game, phrase, %Player{} = player)
       when is_binary(phrase) do
     game
-    |> update_squares(phrase, player, size > @pmark_th_sz)
+    |> update_squares(phrase, player, game.size > @pmark_th_sz)
     |> update_scores()
     |> assign_winner_if_bingo(phrase, player)
   end
 
-  def mark(game, _phrase, _player), do: game
+  def mark_square(game, _phrase, _player), do: game
 
   ## Private functions
 

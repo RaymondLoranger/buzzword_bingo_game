@@ -28,11 +28,11 @@ defmodule Buzzword.Bingo.Game.CheckerTest do
 
     won_game =
       game.("won-game")
-      |> Game.mark("A1", joe)
-      |> Game.mark("A3", jim)
-      |> Game.mark("B2", joe)
-      |> Game.mark("C1", jim)
-      |> Game.mark("C3", joe)
+      |> Game.mark_square("A1", joe)
+      |> Game.mark_square("A3", jim)
+      |> Game.mark_square("B2", joe)
+      |> Game.mark_square("C1", jim)
+      |> Game.mark_square("C3", joe)
 
     games = %{new_game: new_game, won_game: won_game}
     players = %{joe: joe, jim: jim}
@@ -45,9 +45,9 @@ defmodule Buzzword.Bingo.Game.CheckerTest do
 
       game =
         games.new_game
-        |> Game.mark("A1", players.jim)
-        |> Game.mark("A2", players.jim)
-        |> Game.mark("A3", players.jim)
+        |> Game.mark_square("A1", players.jim)
+        |> Game.mark_square("A2", players.jim)
+        |> Game.mark_square("A3", players.jim)
 
       assert Checker.bingo?(game, "A3", players.jim)
     end
