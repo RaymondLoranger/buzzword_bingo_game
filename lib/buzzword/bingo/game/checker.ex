@@ -22,10 +22,10 @@ defmodule Buzzword.Bingo.Game.Checker do
       )
       when is_binary(phrase) do
     with index when is_integer(index) <- index(squares, phrase),
-         false <- size |> row(index) |> line_bingo?(squares, player),
-         false <- size |> col(index) |> line_bingo?(squares, player),
-         false <- size |> main_diag() |> line_bingo?(index, squares, player) do
-      size |> anti_diag() |> line_bingo?(index, squares, player)
+         false <- row(size, index) |> line_bingo?(squares, player),
+         false <- col(size, index) |> line_bingo?(squares, player),
+         false <- main_diag(size) |> line_bingo?(index, squares, player) do
+      anti_diag(size) |> line_bingo?(index, squares, player)
     else
       nil -> false
       true -> true
@@ -49,20 +49,20 @@ defmodule Buzzword.Bingo.Game.Checker do
   defp index(squares, phrase),
     do: Enum.find_index(squares, fn square -> square.phrase == phrase end)
 
-  @spec main_diag(pos_integer) :: [index]
+  @spec main_diag(Game.size()) :: [index]
   defp main_diag(size), do: Enum.take_every(0..(size * size - 1), size + 1)
 
-  @spec anti_diag(pos_integer) :: [index]
+  @spec anti_diag(Game.size()) :: [index]
   defp anti_diag(size),
     do: Enum.take_every((size - 1)..(size * size - size), size - 1)
 
-  @spec row(pos_integer, index) :: [index]
+  @spec row(Game.size(), index) :: [index]
   defp row(size, index) do
     row = div(index, size)
     Enum.to_list((row * size)..(row * size + size - 1))
   end
 
-  @spec col(pos_integer, index) :: [index]
+  @spec col(Game.size(), index) :: [index]
   defp col(size, index) do
     col = rem(index, size)
     Enum.take_every(col..(size * size - size + col), size)

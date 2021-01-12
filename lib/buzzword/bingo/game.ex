@@ -19,9 +19,11 @@ defmodule Buzzword.Bingo.Game do
   @enforce_keys [:name, :size, :squares]
   defstruct name: nil, size: nil, squares: nil, scores: %{}, winner: nil
 
+  @type name :: String.t()
+  @type size :: pos_integer
   @type t :: %Game{
-          name: String.t(),
-          size: pos_integer,
+          name: name,
+          size: size,
           squares: [Square.t()],
           scores: %{Player.t() => {pos_integer, pos_integer}},
           winner: Player.t() | nil
@@ -34,7 +36,7 @@ defmodule Buzzword.Bingo.Game do
   Creates a `game` with a flat list of `size` x `size` squares created
   from the given map or list of `buzzwords` of the form `{phrase, points}`.
   """
-  @spec new(String.t(), pos_integer, map | list) :: t | {:error, atom}
+  @spec new(name, size, map | list) :: t | {:error, atom}
   def new(name, size, buzzwords \\ Cache.get_buzzwords())
 
   def new(name, size, buzzwords)
