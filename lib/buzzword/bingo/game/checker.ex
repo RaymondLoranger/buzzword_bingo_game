@@ -14,7 +14,7 @@ defmodule Buzzword.Bingo.Game.Checker do
   Returns `false` otherwise or when the given `phrase` cannot be found.
   We use lists of `size` indexes to represent the lines to be checked.
   """
-  @spec bingo?(Game.t(), String.t(), Player.t()) :: boolean
+  @spec bingo?(Game.t(), Square.phrase(), Player.t()) :: boolean
   def bingo?(
         %Game{size: size, squares: squares} = _game,
         phrase,
@@ -45,7 +45,7 @@ defmodule Buzzword.Bingo.Game.Checker do
     end)
   end
 
-  @spec index([Square.t()], String.t()) :: index | nil
+  @spec index([Square.t()], Square.phrase()) :: index | nil
   defp index(squares, phrase),
     do: Enum.find_index(squares, fn square -> square.phrase == phrase end)
 

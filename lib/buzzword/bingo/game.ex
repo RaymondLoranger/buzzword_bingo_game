@@ -16,27 +16,35 @@ defmodule Buzzword.Bingo.Game do
   alias Buzzword.Bingo.{Player, Square}
   alias Buzzword.Cache
 
+  @adjectives get_env(:haiku_adjectives)
+  @nouns get_env(:haiku_nouns)
+  @pmark_th_sz get_env(:parallel_marking_threshold_size)
+  @size_range get_env(:size_range)
+
   @enforce_keys [:name, :size, :squares]
   defstruct name: nil, size: nil, squares: nil, scores: %{}, winner: nil
 
+  @type game_score :: {Player.t(), player_score}
+  @type game_scores :: %{Player.t() => player_score}
+  @type marked_count :: pos_integer
   @type name :: String.t()
+  @type player_score :: {points_sum, marked_count}
+  @type points_sum :: pos_integer
   @type size :: pos_integer
   @type t :: %Game{
           name: name,
           size: size,
           squares: [Square.t()],
-          scores: %{Player.t() => {pos_integer, pos_integer}},
+          scores: game_scores,
           winner: Player.t() | nil
         }
 
-  @pmark_th_sz get_env(:parallel_marking_threshold_size)
-  @size_range get_env(:size_range)
-
   @doc """
-  Creates a `game` with a flat list of `size` x `size` squares created
-  from the given map or list of `buzzwords` of the form `{phrase, points}`.
+  Creates a `game` with a list of `size` x `size` buzzwords randomly taken
+  from the given map or a list of `buzzwords` of the form `{phrase, points}`.
   """
-  @spec new(name, size, map | list) :: t | {:error, atom}
+  @spec new(name, size, Cache.buzzwords() | [Cache.buzzword()]) ::
+          t | {:error, atom}
   def new(name, size, buzzwords \\ Cache.get_buzzwords())
 
   def new(name, size, buzzwords)
@@ -57,7 +65,7 @@ defmodule Buzzword.Bingo.Game do
   Marks the square having the given `phrase` for the given `player`,
   updates the scores, and checks for a bingo!
   """
-  @spec mark_square(t, String.t(), Player.t()) :: t
+  @spec mark_square(t, Square.phrase(), Player.t()) :: t
   def mark_square(%Game{winner: nil} = game, phrase, %Player{} = player)
       when is_binary(phrase) do
     game
@@ -68,9 +76,18 @@ defmodule Buzzword.Bingo.Game do
 
   def mark_square(game, _phrase, _player), do: game
 
+  @doc """
+  Generates a unique, URL-friendly name such as "bold-frog-8249".
+  """
+  @spec haiku_name :: name
+  def haiku_name do
+    [Enum.random(@adjectives), Enum.random(@nouns), :rand.uniform(9999)]
+    |> Enum.join("-")
+  end
+
   ## Private functions
 
-  @spec update_squares(t, String.t(), Player.t(), boolean) :: t
+  @spec update_squares(t, Square.phrase(), Player.t(), boolean) :: t
   defp update_squares(game, phrase, player, false = _pmark?) do
     squares = Enum.map(game.squares, &Square.mark(&1, phrase, player))
     put_in(game.squares, squares)
@@ -90,21 +107,20 @@ defmodule Buzzword.Bingo.Game do
 
   @spec update_scores(t) :: t
   defp update_scores(game) do
-    scores =
-      game.squares
-      |> Enum.reject(&is_nil(&1.marked_by))
+    game_scores =
+      Enum.reject(game.squares, &is_nil(&1.marked_by))
       |> Enum.map(fn square -> {square.marked_by, square.points} end)
-      |> Enum.reduce(%{}, fn {player, points}, scores ->
-        Map.update(scores, player, {points, 1}, &inc(&1, points))
+      |> Enum.reduce(%{}, fn {player, points}, game_scores ->
+        Map.update(game_scores, player, {points, 1}, &inc(&1, points))
       end)
 
-    put_in(game.scores, scores)
+    put_in(game.scores, game_scores)
   end
 
-  @spec inc(tuple, pos_integer) :: {pos_integer, pos_integer}
+  @spec inc(player_score, Square.points()) :: player_score
   defp inc({score, marked}, points), do: {score + points, marked + 1}
 
-  @spec assign_winner_if_bingo(t, String.t(), Player.t()) :: t
+  @spec assign_winner_if_bingo(t, Square.phrase(), Player.t()) :: t
   defp assign_winner_if_bingo(game, phrase, player) do
     if Checker.bingo?(game, phrase, player),
       do: put_in(game.winner, player),
