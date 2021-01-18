@@ -109,10 +109,12 @@ defmodule Buzzword.Bingo.Game do
   defp update_scores(game) do
     game_scores =
       Enum.reject(game.squares, &is_nil(&1.marked_by))
-      |> Enum.map(fn square -> {square.marked_by, square.points} end)
-      |> Enum.reduce(%{}, fn {player, points}, game_scores ->
-        Map.update(game_scores, player, {points, 1}, &inc(&1, points))
-      end)
+      |> Enum.reduce(
+        %{},
+        fn %Square{marked_by: player, points: points}, game_scores ->
+          Map.update(game_scores, player, {points, 1}, &inc(&1, points))
+        end
+      )
 
     put_in(game.scores, game_scores)
   end
