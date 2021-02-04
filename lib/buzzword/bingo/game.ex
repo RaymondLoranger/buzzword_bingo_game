@@ -21,6 +21,8 @@ defmodule Buzzword.Bingo.Game do
   @pmark_th_sz get_env(:parallel_marking_threshold_size)
   @size_range get_env(:size_range)
 
+  @derive [Poison.Encoder]
+  @derive Jason.Encoder
   @enforce_keys [:name, :size, :squares]
   defstruct name: nil, size: nil, squares: nil, scores: %{}, winner: nil
 
