@@ -130,16 +130,4 @@ defmodule Buzzword.Bingo.Game do
       do: put_in(game.winner, player),
       else: game
   end
-
-  defimpl Poison.Encoder, for: Tuple do
-    def encode(data, options) when is_tuple(data) do
-      Tuple.to_list(data) |> Poison.Encoder.List.encode(options)
-    end
-  end
-
-  defimpl Jason.Encoder, for: Tuple do
-    def encode(data, opts) when is_tuple(data) do
-      Tuple.to_list(data) |> Jason.Encode.list(opts)
-    end
-  end
 end
