@@ -35,7 +35,65 @@ defmodule Buzzword.Bingo.GameTest do
 
     games = %{new_game: new_game, won_game: won_game}
     players = %{joe: joe, jim: jim}
-    %{games: games, players: players}
+
+    poison =
+      ~s<{"winner":{"name":"Joe","color":"light_blue"},"squares":[{"points":101,"phrase":"A1","marked_by":{"name":"Joe","color":"light_blue"}},{"points":102,"phrase":"A2","marked_by":null},{"points":103,"phrase":"A3","marked_by":{"name":"Jim","color":"light_cyan"}},{"points":201,"phrase":"B1","marked_by":null},{"points":202,"phrase":"B2","marked_by":{"name":"Joe","color":"light_blue"}},{"points":203,"phrase":"B3","marked_by":null},{"points":301,"phrase":"C1","marked_by":{"name":"Jim","color":"light_cyan"}},{"points":302,"phrase":"C2","marked_by":null},{"points":303,"phrase":"C3","marked_by":{"name":"Joe","color":"light_blue"}}],"size":3,"scores\":{"%Buzzword.Bingo.Player{color: \\"light_cyan\\", name: \\"Jim\\"}":[404,2],"%Buzzword.Bingo.Player{color: \\"light_blue\\", name: \\"Joe\\"}":[606,3]},"name":"won-game"}>
+
+    jason =
+      ~s<{"name":"won-game","scores":{"%Buzzword.Bingo.Player{color: \\"light_blue\\", name: \\"Joe\\"}":[606,3],"%Buzzword.Bingo.Player{color: \\"light_cyan\\", name: \\"Jim\\"}":[404,2]},"size":3,"squares":[{"marked_by":{"color":"light_blue","name":"Joe"},"phrase":"A1","points":101},{"marked_by":null,"phrase":"A2","points":102},{"marked_by":{"color":"light_cyan","name":"Jim"},"phrase":"A3","points":103},{"marked_by":null,"phrase":"B1","points":201},{"marked_by":{"color":"light_blue","name":"Joe"},"phrase":"B2","points":202},{"marked_by":null,"phrase":"B3","points":203},{"marked_by":{"color":"light_cyan","name":"Jim"},"phrase":"C1","points":301},{"marked_by":null,"phrase":"C2","points":302},{"marked_by":{"color":"light_blue","name":"Joe"},"phrase":"C3","points":303}],"winner":{"color":"light_blue","name":"Joe"}}>
+
+    decoded = %{
+      "name" => "won-game",
+      "scores" => %{
+        "%Buzzword.Bingo.Player{color: \"light_blue\", name: \"Joe\"}" => [
+          606,
+          3
+        ],
+        "%Buzzword.Bingo.Player{color: \"light_cyan\", name: \"Jim\"}" => [
+          404,
+          2
+        ]
+      },
+      "size" => 3,
+      "squares" => [
+        %{
+          "marked_by" => %{"color" => "light_blue", "name" => "Joe"},
+          "phrase" => "A1",
+          "points" => 101
+        },
+        %{"marked_by" => nil, "phrase" => "A2", "points" => 102},
+        %{
+          "marked_by" => %{"color" => "light_cyan", "name" => "Jim"},
+          "phrase" => "A3",
+          "points" => 103
+        },
+        %{"marked_by" => nil, "phrase" => "B1", "points" => 201},
+        %{
+          "marked_by" => %{"color" => "light_blue", "name" => "Joe"},
+          "phrase" => "B2",
+          "points" => 202
+        },
+        %{"marked_by" => nil, "phrase" => "B3", "points" => 203},
+        %{
+          "marked_by" => %{"color" => "light_cyan", "name" => "Jim"},
+          "phrase" => "C1",
+          "points" => 301
+        },
+        %{"marked_by" => nil, "phrase" => "C2", "points" => 302},
+        %{
+          "marked_by" => %{"color" => "light_blue", "name" => "Joe"},
+          "phrase" => "C3",
+          "points" => 303
+        }
+      ],
+      "winner" => %{"color" => "light_blue", "name" => "Joe"}
+    }
+
+    %{
+      games: games,
+      players: players,
+      json: %{poison: poison, jason: jason, decoded: decoded}
+    }
   end
 
   describe "Game.new/3" do
@@ -112,6 +170,16 @@ defmodule Buzzword.Bingo.GameTest do
 
     test "assigns winner of a won game", %{games: games, players: players} do
       assert games.won_game.winner == players.joe
+    end
+
+    test "can be encoded by Poison", %{games: games, json: json} do
+      assert Poison.encode!(games.won_game) == json.poison
+      assert Poison.decode!(json.poison) == json.decoded
+    end
+
+    test "can be encoded by Jason", %{games: games, json: json} do
+      assert Jason.encode!(games.won_game) == json.jason
+      assert Jason.decode!(json.jason) == json.decoded
     end
   end
 end
