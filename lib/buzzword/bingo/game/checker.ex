@@ -7,6 +7,8 @@ defmodule Buzzword.Bingo.Game.Checker do
 
   @typedoc "Linear index"
   @type index :: non_neg_integer
+  @typedoc "Line (row, column or diagonal) of linear indexes"
+  @type line :: [index]
 
   @doc """
   Returns `true` if all the squares of a line (row, column or diagonal)
@@ -34,11 +36,11 @@ defmodule Buzzword.Bingo.Game.Checker do
 
   ## Private functions
 
-  @spec line_bingo?([index], index, [Square.t()], Player.t()) :: boolean
+  @spec line_bingo?(line, index, [Square.t()], Player.t()) :: boolean
   defp line_bingo?(indexes, index, squares, player),
     do: index in indexes and line_bingo?(indexes, squares, player)
 
-  @spec line_bingo?([index], [Square.t()], Player.t()) :: boolean
+  @spec line_bingo?(line, [Square.t()], Player.t()) :: boolean
   defp line_bingo?(indexes, squares, player) do
     Enum.all?(indexes, fn index ->
       Enum.at(squares, index).marked_by == player
@@ -49,20 +51,20 @@ defmodule Buzzword.Bingo.Game.Checker do
   defp index(squares, phrase),
     do: Enum.find_index(squares, fn square -> square.phrase == phrase end)
 
-  @spec main_diag(Game.size()) :: [index]
+  @spec main_diag(Game.size()) :: line
   defp main_diag(size), do: 0..(size * size - 1) |> Enum.take_every(size + 1)
 
-  @spec anti_diag(Game.size()) :: [index]
+  @spec anti_diag(Game.size()) :: line
   defp anti_diag(size),
     do: (size - 1)..(size * size - size) |> Enum.take_every(size - 1)
 
-  @spec row(Game.size(), index) :: [index]
+  @spec row(Game.size(), index) :: line
   defp row(size, index) do
     row = div(index, size)
     (row * size)..(row * size + size - 1) |> Enum.to_list()
   end
 
-  @spec col(Game.size(), index) :: [index]
+  @spec col(Game.size(), index) :: line
   defp col(size, index) do
     col = rem(index, size)
     col..(size * size - size + col) |> Enum.take_every(size)
