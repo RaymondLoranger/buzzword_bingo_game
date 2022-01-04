@@ -5,14 +5,14 @@ defmodule Buzzword.Bingo.Game.Checker do
 
   alias Buzzword.Bingo.{Game, Player, Square}
 
+  @typedoc "Linear index"
   @type index :: non_neg_integer
 
   @doc """
-  Checks the flat list of `size` x `size` `squares` of the given `game`.
-  Returns `true` if all the `squares` of a line (row, column or diagonal)
+  Returns `true` if all the squares of a line (row, column or diagonal)
   containing the given `phrase` have been marked by the given `player`.
   Returns `false` otherwise or when the given `phrase` cannot be found.
-  We use lists of `size` indexes to represent the lines to be checked.
+  We use lists of linear indexes to represent the lines to be checked.
   """
   @spec bingo?(Game.t(), Square.phrase(), Player.t()) :: boolean
   def bingo?(
@@ -50,21 +50,21 @@ defmodule Buzzword.Bingo.Game.Checker do
     do: Enum.find_index(squares, fn square -> square.phrase == phrase end)
 
   @spec main_diag(Game.size()) :: [index]
-  defp main_diag(size), do: Enum.take_every(0..(size * size - 1), size + 1)
+  defp main_diag(size), do: 0..(size * size - 1) |> Enum.take_every(size + 1)
 
   @spec anti_diag(Game.size()) :: [index]
   defp anti_diag(size),
-    do: Enum.take_every((size - 1)..(size * size - size), size - 1)
+    do: (size - 1)..(size * size - size) |> Enum.take_every(size - 1)
 
   @spec row(Game.size(), index) :: [index]
   defp row(size, index) do
     row = div(index, size)
-    Enum.to_list((row * size)..(row * size + size - 1))
+    (row * size)..(row * size + size - 1) |> Enum.to_list()
   end
 
   @spec col(Game.size(), index) :: [index]
   defp col(size, index) do
     col = rem(index, size)
-    Enum.take_every(col..(size * size - size + col), size)
+    col..(size * size - size + col) |> Enum.take_every(size)
   end
 end

@@ -29,10 +29,6 @@ defmodule Buzzword.Bingo.Game do
   @enforce_keys [:name, :size, :squares]
   defstruct name: nil, size: nil, squares: nil, scores: %{}, winner: nil
 
-  @typedoc "A tuple of player and player score"
-  @type game_score :: {Player.t(), player_score}
-  @typedoc "A map assigning a player score to a player"
-  @type game_scores :: %{Player.t() => player_score}
   @typedoc "Number of marked squares"
   @type marked_count :: pos_integer
   @typedoc "Game name"
@@ -41,6 +37,8 @@ defmodule Buzzword.Bingo.Game do
   @type player_score :: {points_sum, marked_count}
   @typedoc "Total points"
   @type points_sum :: pos_integer
+  @typedoc "A map assigning a player score to a player"
+  @type scores :: %{Player.t() => player_score}
   @typedoc "Game size"
   @type size :: pos_integer
   @typedoc "A game struct for the Multi-Player Bingo game"
@@ -48,13 +46,12 @@ defmodule Buzzword.Bingo.Game do
           name: name,
           size: size,
           squares: [Square.t()],
-          scores: game_scores,
+          scores: scores,
           winner: Player.t() | nil
         }
 
   @doc """
-  Creates a game struct with a list of `size` x `size` buzzwords randomly taken
-  from the given map or a list of `buzzwords` of the form `{phrase, points}`.
+  Creates a game struct with `size` x `size` random buzzwords from `buzzwords`.
   """
   @spec new(name, size, Cache.buzzwords() | [Cache.buzzword()]) ::
           t | {:error, atom}
@@ -101,17 +98,18 @@ defmodule Buzzword.Bingo.Game do
   ## Private functions
 
   @spec update_squares(t, Square.phrase(), Player.t(), boolean) :: t
-  defp update_squares(game, phrase, player, false = _pmark?) do
+  defp update_squares(game, phrase, player, _pmark? = false) do
     squares = Enum.map(game.squares, &Square.mark(&1, phrase, player))
     put_in(game.squares, squares)
   end
 
-  defp update_squares(game, phrase, player, true = _pmark?) do
+  defp update_squares(game, phrase, player, _pmark?) do
     squares = pmap(game.squares, &Square.mark(&1, phrase, player))
     put_in(game.squares, squares)
   end
 
-  @spec pmap(Enum.t(), (any -> any)) :: list
+  # @spec pmap(Enum.t(), (any -> any)) :: list
+  @spec pmap([Square.t()], (Square.t() -> Square.t())) :: [Square.t()]
   defp pmap(enum, fun) do
     enum
     |> Enum.map(&Task.async(fn -> fun.(&1) end))
@@ -120,16 +118,16 @@ defmodule Buzzword.Bingo.Game do
 
   @spec update_scores(t) :: t
   defp update_scores(game) do
-    game_scores =
+    scores =
       Enum.reject(game.squares, &is_nil(&1.marked_by))
       |> Enum.reduce(
         %{},
-        fn %Square{marked_by: player, points: points}, game_scores ->
-          Map.update(game_scores, player, {points, 1}, &inc(&1, points))
+        fn %Square{marked_by: player, points: points}, scores ->
+          Map.update(scores, player, {points, 1}, &inc(&1, points))
         end
       )
 
-    put_in(game.scores, game_scores)
+    put_in(game.scores, scores)
   end
 
   @spec inc(player_score, Square.points()) :: player_score
