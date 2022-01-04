@@ -3,8 +3,11 @@
 # └────────────────────────────────────────────────────────────────────┘
 defmodule Buzzword.Bingo.Game do
   @moduledoc """
-  Creates a `game` struct for the _Multi-Player Bingo_ game.
-  Also marks the square having a given `phrase` for a given `player`.
+  A game struct and functions for the _Multi-Player Bingo_ game.
+
+  The game struct contains the fields `name`, `size`, `squares`, `scores` and
+  `winner` representing the characteristics of a game in the _Multi-Player
+  Bingo_ game.
 
   ##### Based on the course [Multi-Player Bingo](https://pragmaticstudio.com/courses/unpacked-bingo) by Mike and Nicole Clark.
   """
@@ -26,13 +29,21 @@ defmodule Buzzword.Bingo.Game do
   @enforce_keys [:name, :size, :squares]
   defstruct name: nil, size: nil, squares: nil, scores: %{}, winner: nil
 
+  @typedoc "A tuple of player and player score"
   @type game_score :: {Player.t(), player_score}
+  @typedoc "A map assigning a player score to a player"
   @type game_scores :: %{Player.t() => player_score}
+  @typedoc "Number of marked squares"
   @type marked_count :: pos_integer
+  @typedoc "Game name"
   @type name :: String.t()
+  @typedoc "A tuple of total points and number of marked squares"
   @type player_score :: {points_sum, marked_count}
+  @typedoc "Total points"
   @type points_sum :: pos_integer
+  @typedoc "Game size"
   @type size :: pos_integer
+  @typedoc "A game struct for the Multi-Player Bingo game"
   @type t :: %Game{
           name: name,
           size: size,
@@ -42,7 +53,7 @@ defmodule Buzzword.Bingo.Game do
         }
 
   @doc """
-  Creates a `game` with a list of `size` x `size` buzzwords randomly taken
+  Creates a game struct with a list of `size` x `size` buzzwords randomly taken
   from the given map or a list of `buzzwords` of the form `{phrase, points}`.
   """
   @spec new(name, size, Cache.buzzwords() | [Cache.buzzword()]) ::
@@ -64,7 +75,7 @@ defmodule Buzzword.Bingo.Game do
   def new(_name, _size, _buzzwords), do: {:error, :invalid_game_args}
 
   @doc """
-  Marks the square having the given `phrase` for the given `player`,
+  Marks the square having the given `phrase` with the given `player`,
   updates the scores, and checks for a bingo!
   """
   @spec mark_square(t, Square.phrase(), Player.t()) :: t
