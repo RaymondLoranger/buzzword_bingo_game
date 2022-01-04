@@ -5,16 +5,15 @@ defmodule Buzzword.Bingo.Game.Checker do
 
   alias Buzzword.Bingo.{Game, Player, Square}
 
-  @typedoc "Linear index"
-  @type index :: non_neg_integer
-  @typedoc "Line (row, column or diagonal) of linear indexes"
-  @type line :: [index]
+  # Linear index
+  @typep index :: non_neg_integer
+  # Line (row, column or diagonal) of linear indexes
+  @typep line :: [index]
 
   @doc """
   Returns `true` if all the squares of a line (row, column or diagonal)
   containing the given `phrase` have been marked by the given `player`.
   Returns `false` otherwise or when the given `phrase` cannot be found.
-  We use lists of linear indexes to represent the lines to be checked.
   """
   @spec bingo?(Game.t(), Square.phrase(), Player.t()) :: boolean
   def bingo?(
@@ -23,6 +22,7 @@ defmodule Buzzword.Bingo.Game.Checker do
         %Player{} = player
       )
       when is_binary(phrase) do
+    # NOTE: Lists of linear indexes represent the lines to be checked.
     with index when is_integer(index) <- index(squares, phrase),
          false <- row(size, index) |> line_bingo?(squares, player),
          false <- col(size, index) |> line_bingo?(squares, player),
