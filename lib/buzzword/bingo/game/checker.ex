@@ -5,11 +5,6 @@ defmodule Buzzword.Bingo.Game.Checker do
 
   alias Buzzword.Bingo.{Game, Player, Square}
 
-  # Linear index
-  @typep index :: non_neg_integer
-  # Line (row, column or diagonal) of linear indexes
-  @typep line :: [index]
-
   @doc """
   Returns `true` if all the squares of a line (row, column or diagonal)
   containing the given `phrase` have been marked by the given `player`.
@@ -35,6 +30,11 @@ defmodule Buzzword.Bingo.Game.Checker do
   end
 
   ## Private functions
+
+  # Linear index
+  @typep index :: non_neg_integer
+  # Line (row, column or diagonal) of linear indexes
+  @typep line :: [index]
 
   @spec line_bingo?(line, index, [Square.t()], Player.t()) :: boolean
   defp line_bingo?(indexes, index, squares, player),
