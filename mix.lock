@@ -1,7 +1,7 @@
 %{
   "buzzword_bingo_player": {:git, "https://github.com/RaymondLoranger/buzzword_bingo_player.git", "abe68a172edd787b615ef3e3e48f51d1abc747b6", []},
-  "buzzword_bingo_square": {:git, "https://github.com/RaymondLoranger/buzzword_bingo_square.git", "3f84ae53ba2086fe911d3842907d166854dd0a2c", []},
-  "buzzword_cache": {:git, "https://github.com/RaymondLoranger/buzzword_cache.git", "051844684ed30b4075ec101e8337624d15f18589", []},
+  "buzzword_bingo_square": {:git, "https://github.com/RaymondLoranger/buzzword_bingo_square.git", "6da5366299265329a925d3081a4d01347bdc3a45", []},
+  "buzzword_cache": {:git, "https://github.com/RaymondLoranger/buzzword_cache.git", "bcee5c42a9914066ef6beb8d130a61b4a7c9e1fb", []},
   "dialyxir": {:hex, :dialyxir, "1.1.0", "c5aab0d6e71e5522e77beff7ba9e08f8e02bad90dfbeffae60eaf0cb47e29488", [:mix], [{:erlex, ">= 0.2.6", [hex: :erlex, repo: "hexpm", optional: false]}], "hexpm", "07ea8e49c45f15264ebe6d5b93799d4dd56a44036cf42d0ad9c960bc266c0b9a"},
   "earmark_parser": {:hex, :earmark_parser, "1.4.19", "de0d033d5ff9fc396a24eadc2fcf2afa3d120841eb3f1004d138cbf9273210e8", [:mix], [], "hexpm", "527ab6630b5c75c3a3960b75844c314ec305c76d9899bb30f71cb85952a9dc45"},
   "erlex": {:hex, :erlex, "0.2.6", "c7987d15e899c7a2f34f5420d2a2ea0d659682c06ac607572df55a43753aa12e", [:mix], [], "hexpm", "2ed2e25711feb44d52b17d2780eabf998452f6efda104877a3881c2f8c0c0c75"},
