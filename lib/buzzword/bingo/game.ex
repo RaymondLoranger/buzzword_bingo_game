@@ -52,10 +52,12 @@ defmodule Buzzword.Bingo.Game do
 
   @doc """
   Creates a game struct with `size` x `size` random buzzwords from `buzzwords`.
+  The default value for `buzzwords` is provided by function
+  `Buzzword.Cache.get_buzzwords/0`.
   """
   @spec new(name, size, Cache.buzzwords() | [Cache.buzzword()]) ::
           t | {:error, atom}
-  def new(name, size, buzzwords \\ Cache.get_buzzwords())
+  def new(name, size, buzzwords \\ Buzzword.Cache.get_buzzwords())
 
   def new(name, size, buzzwords)
       when is_binary(name) and size in @size_range and is_map(buzzwords) and
