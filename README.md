@@ -1,6 +1,6 @@
 # Buzzword Bingo Game
 
-A game struct and functions for the _Multi-Player Bingo_ game.
+A game struct and functions for the _Multi-Player Buzzword Bingo_ game.
 
 ##### Based on the course [Multi-Player Bingo](https://pragmaticstudio.com/courses/unpacked-bingo) by Mike and Nicole Clark.
 

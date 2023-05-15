@@ -3,11 +3,11 @@
 # └────────────────────────────────────────────────────────────────────┘
 defmodule Buzzword.Bingo.Game do
   @moduledoc """
-  A game struct and functions for the _Multi-Player Bingo_ game.
+  A game struct and functions for the _Multi-Player Buzzword Bingo_ game.
 
   The game struct contains the fields `name`, `size`, `squares`, `scores` and
   `winner` representing the characteristics of a game in the _Multi-Player
-  Bingo_ game.
+  Buzzword Bingo_ game.
 
   ##### Based on the course [Multi-Player Bingo](https://pragmaticstudio.com/courses/unpacked-bingo) by Mike and Nicole Clark.
   """
@@ -41,7 +41,7 @@ defmodule Buzzword.Bingo.Game do
   @type scores :: %{Player.t() => player_score}
   @typedoc "Game size"
   @type size :: pos_integer
-  @typedoc "A game struct for the Multi-Player Bingo game"
+  @typedoc "A game struct for the Multi-Player Buzzword Bingo game"
   @type t :: %Game{
           name: name,
           size: size,
