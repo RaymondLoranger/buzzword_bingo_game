@@ -62,7 +62,7 @@ defmodule Buzzword.Bingo.GameTest do
 
     test "returns a tuple" do
       assert Game.new("bad", 6) == {:error, :invalid_game_args}
-      assert Game.new('bad', 3) == {:error, :invalid_game_args}
+      assert Game.new(~c"bad", 3) == {:error, :invalid_game_args}
     end
 
     test "returns a tuple in a `with` macro" do
