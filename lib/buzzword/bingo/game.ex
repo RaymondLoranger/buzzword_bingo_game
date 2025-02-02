@@ -6,8 +6,8 @@ defmodule Buzzword.Bingo.Game do
   A game struct and functions for the _Multi-Player Buzzword Bingo_ game.
 
   The game struct contains the fields `name`, `size`, `squares`, `scores` and
-  `winner` representing the characteristics of a game in the _Multi-Player
-  Buzzword Bingo_ game.
+  `winner` representing the properties of a game in the _Multi-Player Buzzword
+  Bingo_ game.
 
   ##### Based on the course [Multi-Player Bingo](https://pragmaticstudio.com/courses/unpacked-bingo) by Mike and Nicole Clark.
   """
@@ -24,7 +24,6 @@ defmodule Buzzword.Bingo.Game do
   @pmark_th_sz get_env(:parallel_marking_threshold_size)
   @size_range get_env(:size_range)
 
-  @derive Jason.Encoder
   @enforce_keys [:name, :size, :squares]
   defstruct name: nil, size: nil, squares: nil, scores: %{}, winner: nil
 
