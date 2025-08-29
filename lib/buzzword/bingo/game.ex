@@ -5,9 +5,16 @@ defmodule Buzzword.Bingo.Game do
   @moduledoc """
   A game struct and functions for the _Multi-Player Buzzword Bingo_ game.
 
-  The game struct contains the fields `name`, `size`, `squares`, `scores` and
-  `winner` representing the properties of a game in the _Multi-Player Buzzword
-  Bingo_ game.
+  The game struct contains the fields:
+
+    - `name`
+    - `size`
+    - `squares`
+    - `scores`
+    - `winner`
+
+  representing the properties of a game in the _Multi-Player Buzzword Bingo_
+  game.
 
   ##### Based on the course [Multi-Player Bingo](https://pragmaticstudio.com/courses/unpacked-bingo) by Mike and Nicole Clark.
   """
