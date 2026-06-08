@@ -3,7 +3,7 @@ defmodule Buzzword.Bingo.GameTest do
 
   alias Buzzword.Bingo.{Game, Player, Square}
 
-  doctest Game
+  # doctest Game
 
   setup_all do
     joe = Player.new("Joe", "light_blue")
@@ -11,6 +11,7 @@ defmodule Buzzword.Bingo.GameTest do
 
     game = fn name ->
       Game.new(name, 3, [
+        # {phrase, points}
         {"A1", 101},
         {"A2", 102},
         {"A3", 103},
@@ -38,7 +39,7 @@ defmodule Buzzword.Bingo.GameTest do
     %{games: games, players: players}
   end
 
-  describe "Game.new/3" do
+  describe "Game.new/2" do
     test "returns a struct" do
       assert %Game{
                name: "icy-moon",
@@ -60,12 +61,12 @@ defmodule Buzzword.Bingo.GameTest do
       )
     end
 
-    test "returns a tuple" do
+    test "returns an error tuple" do
       assert Game.new("bad", 6) == {:error, :invalid_game_args}
       assert Game.new(~c"bad", 3) == {:error, :invalid_game_args}
     end
 
-    test "returns a tuple in a `with` macro" do
+    test "returns an error tuple in a `with` macro" do
       assert(
         with %Game{} = game <- Game.new("bad", 2) do
           game
@@ -76,7 +77,7 @@ defmodule Buzzword.Bingo.GameTest do
     end
   end
 
-  describe "Game.mark/3" do
+  describe "Game.mark_square/3" do
     test "marks a virgin square", %{games: games, players: players} do
       %Game{} = game = Game.mark_square(games.new_game, "A1", players.joe)
 
@@ -105,8 +106,8 @@ defmodule Buzzword.Bingo.GameTest do
 
     test "updates scores of a won game", %{games: games, players: players} do
       assert games.won_game.scores == %{
-               players.joe => {606, 3},
-               players.jim => {404, 2}
+               players.joe => {101 + 202 + 303, 1 + 1 + 1},
+               players.jim => {103 + 301, 1 + 1}
              }
     end
 

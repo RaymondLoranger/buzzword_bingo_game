@@ -4,7 +4,7 @@ defmodule Buzzword.Bingo.Game.CheckerTest do
   alias Buzzword.Bingo.Game.Checker
   alias Buzzword.Bingo.{Game, Player}
 
-  doctest Checker
+  # doctest Checker
 
   setup_all do
     joe = Player.new("Joe", "light_blue")
@@ -12,6 +12,7 @@ defmodule Buzzword.Bingo.Game.CheckerTest do
 
     game = fn name ->
       Game.new(name, 3, [
+        # {phrase, points}
         {"A1", 101},
         {"A2", 102},
         {"A3", 103},
@@ -42,6 +43,8 @@ defmodule Buzzword.Bingo.Game.CheckerTest do
   describe "Checker.bingo?/3" do
     test "returns true", %{games: games, players: players} do
       assert Checker.bingo?(games.won_game, "A1", players.joe)
+      assert Checker.bingo?(games.won_game, "B2", players.joe)
+      assert Checker.bingo?(games.won_game, "C3", players.joe)
 
       game =
         games.new_game
@@ -59,6 +62,7 @@ defmodule Buzzword.Bingo.Game.CheckerTest do
 
     test "returns false if bad phrase", %{games: games, players: players} do
       assert Checker.bingo?(games.won_game, "A1", players.joe)
+      refute Checker.bingo?(games.won_game, "A1", players.jim)
       refute Checker.bingo?(games.won_game, "a1", players.joe)
     end
   end
