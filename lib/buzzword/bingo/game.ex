@@ -76,7 +76,9 @@ defmodule Buzzword.Bingo.Game do
     %Game{name: name, size: size, squares: Enum.map(buzzwords, &Square.new/1)}
   end
 
-  def new(_name, _size, _buzzwords), do: {:error, :invalid_game_args}
+  def new(_name, _size, _buzzwords) do
+    {:error, :invalid_game_args}
+  end
 
   @doc """
   Marks the square having the given `phrase` with the given `player`,

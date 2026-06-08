@@ -42,8 +42,9 @@ defmodule Buzzword.Bingo.Game.Checker do
   @spec bingo_line?(line, [Square.t()], Player.t()) :: boolean
   defp bingo_line?(indexes, squares, player) do
     player ==
-      indexes
-      |> Stream.map(&Enum.at(squares, &1).marked_by)
+      for index <- indexes do
+        Enum.at(squares, index).marked_by
+      end
       |> Enum.find(player, &(&1 != player))
   end
 
