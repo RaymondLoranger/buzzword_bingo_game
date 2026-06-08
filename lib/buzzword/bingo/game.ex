@@ -28,7 +28,7 @@ defmodule Buzzword.Bingo.Game do
 
   @adjectives get_env(:haiku_adjectives)
   @nouns get_env(:haiku_nouns)
-  @pmark_th_sz get_env(:parallel_marking_threshold_size)
+  @pmark_thld_size get_env(:parallel_marking_threshold_size)
   @size_range get_env(:size_range)
 
   @enforce_keys [:name, :size, :squares]
@@ -80,18 +80,24 @@ defmodule Buzzword.Bingo.Game do
 
   @doc """
   Marks the square having the given `phrase` with the given `player`,
-  updates the scores, and checks for a bingo!
+  updates the scores, and assigns the bingo winner, if any.
   """
   @spec mark_square(t, Square.phrase(), Player.t()) :: t
-  def mark_square(%Game{winner: nil} = game, phrase, %Player{} = player)
+  def mark_square(
+        %Game{size: size, scores: scores, winner: nil} = game,
+        phrase,
+        %Player{} = player
+      )
       when is_binary(phrase) do
     game
-    |> update_squares(phrase, player, game.size > @pmark_th_sz)
+    |> update_squares(phrase, player, size > @pmark_thld_size)
     |> update_scores()
-    |> assign_winner_if_bingo(phrase, player)
+    |> assign_winner(phrase, player, scores)
   end
 
-  def mark_square(game, _phrase, _player), do: game
+  def mark_square(game, _phrase, _player) do
+    game
+  end
 
   @doc """
   Generates a unique, URL-friendly name such as "bold-frog-8249".
@@ -105,45 +111,62 @@ defmodule Buzzword.Bingo.Game do
   ## Private functions
 
   @spec update_squares(t, Square.phrase(), Player.t(), boolean) :: t
-  defp update_squares(game, phrase, player, _pmark? = false) do
-    squares = Enum.map(game.squares, &Square.mark(&1, phrase, player))
-    put_in(game.squares, squares)
+  defp update_squares(
+         %Game{squares: squares} = game,
+         phrase,
+         player,
+         _pmark? = false
+       ) do
+    squares
+    |> Enum.map(&Square.mark(&1, phrase, player))
+    |> then(&put_in(game.squares, &1))
   end
 
-  defp update_squares(game, phrase, player, _pmark?) do
-    squares = pmap(game.squares, &Square.mark(&1, phrase, player))
-    put_in(game.squares, squares)
+  defp update_squares(
+         %Game{squares: squares} = game,
+         phrase,
+         player,
+         _pmark?
+       ) do
+    squares
+    |> pmap(&Square.mark(&1, phrase, player))
+    |> then(&put_in(game.squares, &1))
   end
 
-  # @spec pmap(Enum.t(), (any -> any)) :: list
   @spec pmap([Square.t()], (Square.t() -> Square.t())) :: [Square.t()]
-  defp pmap(enum, fun) do
-    enum
-    |> Enum.map(&Task.async(fn -> fun.(&1) end))
+  defp pmap(squares, mark_fun) do
+    squares
+    |> Enum.map(&Task.async(fn -> mark_fun.(&1) end))
     |> Enum.map(&Task.await/1)
   end
 
   @spec update_scores(t) :: t
-  defp update_scores(game) do
-    scores =
-      Enum.reject(game.squares, &is_nil(&1.marked_by))
-      |> Enum.reduce(
-        %{},
-        fn %Square{marked_by: player, points: points}, scores ->
-          Map.update(scores, player, {points, 1}, &inc(&1, points))
-        end
-      )
-
-    put_in(game.scores, scores)
+  defp update_scores(%Game{squares: squares} = game) do
+    for %Square{marked_by: player, points: points} <- squares,
+        player != nil,
+        reduce: %{} do
+      scores -> Map.update(scores, player, {points, 1}, &inc(&1, points))
+    end
+    |> then(&put_in(game.scores, &1))
   end
 
   @spec inc(player_score, Square.points()) :: player_score
-  defp inc({score, marked}, points), do: {score + points, marked + 1}
+  defp inc({sum, count}, points), do: {sum + points, count + 1}
 
-  @spec assign_winner_if_bingo(t, Square.phrase(), Player.t()) :: t
-  defp assign_winner_if_bingo(game, phrase, player) do
-    if Checker.bingo?(game, phrase, player),
-      do: put_in(game.winner, player),
-      else: game
+  # Scores didn't change, so no bingo possible.
+  @spec assign_winner(t, Square.phrase(), Player.t(), scores) :: t
+  defp assign_winner(%Game{scores: scores} = game, _phrase, _player, scores) do
+    game
   end
+
+  # Scores changed, so a square was marked.
+  defp assign_winner(game, phrase, player, _scores) do
+    game
+    |> Checker.bingo?(phrase, player)
+    |> assign_winner(game, player)
+  end
+
+  @spec assign_winner(boolean, t, Player.t()) :: t
+  defp assign_winner(_bingo? = false, game, _player), do: game
+  defp assign_winner(_bingo?, game, player), do: put_in(game.winner, player)
 end
