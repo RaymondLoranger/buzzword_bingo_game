@@ -10,6 +10,9 @@ defmodule Buzzword.Bingo.GameTest do
     jim = Player.new("Jim", "light_cyan")
 
     game = fn name ->
+      # "A1" "A2" "A3"
+      # "B1" "B2" "B3"
+      # "C1" "C2" "C3"
       Game.new(name, 3, [
         # {phrase, points}
         {"A1", 101},

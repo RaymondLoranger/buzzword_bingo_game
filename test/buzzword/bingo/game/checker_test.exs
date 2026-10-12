@@ -11,6 +11,9 @@ defmodule Buzzword.Bingo.Game.CheckerTest do
     jim = Player.new("Jim", "light_cyan")
 
     game = fn name ->
+      # "A1" "A2" "A3"
+      # "B1" "B2" "B3"
+      # "C1" "C2" "C3"
       Game.new(name, 3, [
         # {phrase, points}
         {"A1", 101},
@@ -52,6 +55,8 @@ defmodule Buzzword.Bingo.Game.CheckerTest do
         |> Game.mark_square("A2", players.jim)
         |> Game.mark_square("A3", players.jim)
 
+      assert Checker.bingo?(game, "A1", players.jim)
+      assert Checker.bingo?(game, "A2", players.jim)
       assert Checker.bingo?(game, "A3", players.jim)
     end
 
@@ -60,7 +65,8 @@ defmodule Buzzword.Bingo.Game.CheckerTest do
       refute Checker.bingo?(games.won_game, "A3", players.jim)
     end
 
-    test "returns false if bad phrase", %{games: games, players: players} do
+    test "returns false if bad phrase or player",
+         %{games: games, players: players} do
       assert Checker.bingo?(games.won_game, "A1", players.joe)
       refute Checker.bingo?(games.won_game, "A1", players.jim)
       refute Checker.bingo?(games.won_game, "a1", players.joe)

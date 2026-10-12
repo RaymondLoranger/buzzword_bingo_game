@@ -39,13 +39,13 @@ defmodule Buzzword.Bingo.Game.Checker do
   @typep line :: Range.t()
 
   # Diagonal bingo? If so, the diagonal must contain the latest marked square.
+  # Hence no need to confirm the marked square index is in the diagonal range.
   @spec bingo_line?(line, [Square.t()], Player.t()) :: boolean
   defp bingo_line?(indexes, squares, player) do
-    player ==
-      for index <- indexes do
-        Enum.at(squares, index).marked_by
-      end
-      |> Enum.find(player, &(&1 != player))
+    for index <- indexes do
+      Enum.at(squares, index).marked_by
+    end
+    |> Enum.all?(&(&1 == player))
   end
 
   # Find the index of the square containing `phrase`.
@@ -54,19 +54,43 @@ defmodule Buzzword.Bingo.Game.Checker do
     do: Enum.find_index(squares, &(&1.phrase == phrase))
 
   @spec main_diag(Game.size()) :: line
-  defp main_diag(size), do: 0..(size * size - 1)//(size + 1)
+  defp main_diag(size) do
+    # 0 1 2
+    # 3 4 5
+    # 6 7 8
+    # The range is 0..8//4.
+    0..(size * size - 1)//(size + 1)
+  end
 
   @spec anti_diag(Game.size()) :: line
-  defp anti_diag(size), do: (size - 1)..(size * size - size)//(size - 1)
+  defp anti_diag(size) do
+    # 0 1 2
+    # 3 4 5
+    # 6 7 8
+    # The range is 2..6//2.
+    (size - 1)..(size * size - size)//(size - 1)
+  end
 
   @spec row(Game.size(), index) :: line
   defp row(size, index) do
+    # 0 1 2
+    # 3 4 5
+    # 6 7 8
+    # If index is 1, then row is 0 and the range is 0..2.
+    # If index is 4, then row is 1 and the range is 3..5.
+    # If index is 7, then row is 2 and the range is 6..8.
     row = div(index, size)
     (row * size)..(row * size + size - 1)
   end
 
   @spec col(Game.size(), index) :: line
   defp col(size, index) do
+    # 0 1 2
+    # 3 4 5
+    # 6 7 8
+    # If index is 3, then col is 0 and the range is 0..6//3.
+    # If index is 4, then col is 1 and the range is 1..7//3.
+    # If index is 5, then col is 2 and the range is 2..8//3.
     col = rem(index, size)
     col..(size * size - size + col)//size
   end
